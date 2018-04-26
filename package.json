@@ -1,0 +1,10 @@
+{
+  "name": "E-D-G-E",
+  "version": "1.0.0",
+  "description": "N-O-D-E Discord Bot",
+  "main": "src/app.js",
+  "author": "",
+  "dependencies": {
+    "discord.js": "^11.3.2"
+  }
+}
