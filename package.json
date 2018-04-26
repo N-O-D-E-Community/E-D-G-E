@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "N-O-D-E Discord Bot",
   "main": "src/app.js",
-  "author": "",
+  "author": "N-O-D-E Community",
+  "license": "GPL-3.0",
   "dependencies": {
     "discord.js": "^11.3.2"
   }
