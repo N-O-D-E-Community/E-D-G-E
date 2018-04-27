@@ -5,6 +5,7 @@ A Discord bot for the N-O-D-E community
 
 ### Setting up
 
+ - Request to be added to the N-O-D-E Community organization on GitHub by @D3add3d on the [N-O-D-E community Discord server](https://discord.gg/g9uvEAP)
  - Fork the repository
  - Clone your forked repository
  - Run `npm install`
