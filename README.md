@@ -18,8 +18,7 @@ A Discord bot for the N-O-D-E community
  
 ### Rules
  
- - Fork the repository before making changes and clone it
- - Make pull request when you are done
+ - Make pull request when making changes
  - Pull requests should stay open until everyone agree on the changes
  - Pushing directly to `master` is forbidden, push to `dev`, `master` is to be considered stable
  - `dev` can be merged into `master` only after all new features and changes have been tested
