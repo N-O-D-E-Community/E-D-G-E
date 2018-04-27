@@ -1,16 +1,16 @@
-process.stdout.write("starting E-D-G-E.. ");
+console.log("starting E-D-G-E.. ");
 
 const fs = require('fs');
 const Discord = require('discord.js');
 const client = new Discord.Client();
-var config = require("../run/config.json");
+let config = require("../run/config.json");
 
 // dynamic command dir
-const cmdFiles = fs.readdirSync('./cmd');
+const cmdFiles = fs.readdirSync('./src/cmd');
 
 client.commands = new Discord.Collection();
 for (const file of cmdFiles) {
-	const cmd = require(`./cmd/${file}`);
+	let cmd = require(`./cmd/${file}`);
 	client.commands.set(cmd.name, cmd);
 }
 

@@ -1,5 +1,5 @@
 {
-  "name": "E-D-G-E",
+  "name": "e-d-g-e",
   "version": "1.0.0",
   "description": "N-O-D-E Discord Bot",
   "main": "src/app.js",
@@ -7,5 +7,18 @@
   "license": "GPL-3.0",
   "dependencies": {
     "discord.js": "^11.3.2"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/N-O-D-E-Community/E-D-G-E.git"
+  },
+  "bugs": {
+    "url": "https://github.com/N-O-D-E-Community/E-D-G-E/issues"
+  },
+  "homepage": "https://github.com/N-O-D-E-Community/E-D-G-E#readme"
 }
