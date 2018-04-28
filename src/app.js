@@ -2,17 +2,25 @@ console.log("starting E-D-G-E.. ");
 
 // load config, create template if file doesn't exist
 const fs = require('fs');
+
 try{
 	var config = require("../run/config.json");
 } catch(e){
+  let filePath = process.cwd() + "\\run\\config.json";
+  if(fs.existsSync(filePath)){
+    console.log("Your config file is invalid. Please edit " + filePath);
+    process.exit(1);
+  }
 	console.log("No config file found, creating a template.");
 	let config = {};
 	config.prefix = "!";
 	config.token = "insert-token-here";
 	config.owner = "insert-id-here";
+  fs.writeFileSync(filePath, JSON.stringify(config),
+  function (err) { console.log(err ? 'Error :'+err : 'ok') });
 
-	console.log("Please edit " + filePath + " and restart the app.");
-	exit(0);
+  console.log("Please edit " + filePath + " and restart the app.");
+	process.exit(1);
 }
 
 const Discord = require('discord.js');
