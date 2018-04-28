@@ -1,4 +1,4 @@
-console.log("starting E-D-G-E.. ");
+console.log('Starting E-D-G-E...');
 
 const path = require('path');
 const fs = require('fs');
@@ -6,18 +6,21 @@ let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const admin = require('firebase-admin');
-const serviceAccount = require("../run/serviceAccountKey.json");
+const serviceAccount = require('../run/serviceAccountKey.json');
 
-// load config, create template if file doesn't exist
+/*
+Try to load the config file, if it does not exist create one from template and save it
+ */
 try {
-    config = require("../run/config.json");
+    config = require('../run/config.json');
 } catch (e) {
-    let filePath = path.join(process.cwd(), "./run/config.json");
+    let filePath = path.join(process.cwd(), './run/config.json');
     if (fs.existsSync(filePath)) {
-        console.log("Your config file is invalid. Please edit " + filePath);
-        process.exit(1);
+        console.log('Failed to load the config.json file ' + filePath);
+        console.error(e);
+        process.exit(0);
     }
-    console.log("No config file found, creating a template.");
+    console.log('No config file found, creating a template.');
     config = {
         "token": "YOUR_TOKEN",
         "prefix": "YOUR_PREFIX",
@@ -28,14 +31,13 @@ try {
     try {
         fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
     } catch(error) {
-        console.log(error);
+        console.log('Failed to create config file!');
+        console.error(error);
     }
 
-    console.log("Please edit " + filePath + " and restart the app.");
+    console.log('Please edit ', filePath, ' and restart the app.'); //avoid type conversion by using commas instead of concat.
     process.exit(0);
 }
-//TODO: add more config validation ("do these values even make sense?")
-// config is valid, moving on
 
 /* FIREBASE */
 admin.initializeApp({
@@ -73,7 +75,7 @@ client.on('message', msg => {
     const command = args.shift().toLowerCase();
 
     if (!client.commands.has(command)) {
-        msg.reply("There is no such command!");
+        msg.reply('requested command was not found!');
         return;
     }
 
@@ -81,13 +83,13 @@ client.on('message', msg => {
         client.commands.get(command).execute(refs, msg, args);
     } catch (error) {
         console.error(error);
-        msg.reply('Error :/');
+        msg.reply('an error has occurred, please notify bot developers.');
     }
 });
 
 // start
 client.login(config.token).catch(err => {
-    console.log("PLEASE CHANGE TOKEN AND OTHER FIELDS IN CONFIG.JSON TO CONTINUE");
+    console.log('******EDIT CONFIG.JSON TO CONTINUE******');
     console.log(err);
     process.exit(0);
 });

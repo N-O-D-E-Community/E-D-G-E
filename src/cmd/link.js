@@ -6,6 +6,7 @@ module.exports = {
     description: 'Checks and adds link to the database',
     execute(refs, msg, args) {
         if (validUrl.isUri(args[0])) {
+            // noinspection JSUnresolvedFunction
             urlExists(args[0]).then(function (response) {
                 if (response) {
                     let collectionRef = refs.database.collection('links');
@@ -21,7 +22,8 @@ module.exports = {
                             collectionRef.add({
                                 'link': args[0],
                                 'timestamp': Date.now(),
-                                'seen': false
+                                'seen': false,
+                                'user': msg.author.username
                             });
                         }
                     });
@@ -32,7 +34,7 @@ module.exports = {
                 msg.reply('link is not reachable!');
             });
         } else {
-            msg.reply("link is in invalid format!");
+            msg.reply('link is in invalid format!');
         }
     }
 
