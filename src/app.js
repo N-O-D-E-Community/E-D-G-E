@@ -1,4 +1,10 @@
-console.log('Starting E-D-G-E...');
+const winston = require('winston');
+winston.add(winston.transports.File, { filename: "edge.log" });
+winston.level = 'debug'; //TODO: set to info in production
+
+global.winston = winston;
+
+winston.info('Starting E-D-G-E...');
 
 const path = require('path');
 const fs = require('fs');
@@ -16,11 +22,11 @@ try {
 } catch (e) {
     let filePath = path.join(process.cwd(), './run/config.json');
     if (fs.existsSync(filePath)) {
-        console.log('Failed to load the config.json file ' + filePath);
-        console.error(e);
+        winston.info('Failed to load the config.json file ' + filePath);
+        winston.error(e);
         process.exit(0);
     }
-    console.log('No config file found, creating a template.');
+    winston.info('No config file found, creating a template.');
     config = {
         "token": "YOUR_TOKEN",
         "prefix": "YOUR_PREFIX",
@@ -28,14 +34,15 @@ try {
         "databaseURL": "FIREBASEIO_DATABASE_URL"
     };
 
+    winston.debug('Creating config.json');
     try {
         fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
     } catch(error) {
-        console.log('Failed to create config file!');
-        console.error(error);
+        winston.info('Failed to create config file!');
+        winston.error(error);
     }
 
-    console.log('Please edit ', filePath, ' and restart the app.'); //avoid type conversion by using commas instead of concat.
+    winston.info('Please edit ', filePath, ' and restart the app.'); //avoid type conversion by using commas instead of concat.
     process.exit(0);
 }
 
@@ -64,7 +71,7 @@ for (const file of cmdFiles) {
 
 // events
 client.on('ready', () => {
-    console.log("OK!");
+    winston.info("E-D-G-E ready!");
 });
 
 client.on('message', msg => {
@@ -75,6 +82,7 @@ client.on('message', msg => {
     const command = args.shift().toLowerCase();
 
     if (!client.commands.has(command)) {
+        winston.debug('User ', msg.author.username, ' tried to execute non-existing command');
         msg.reply('requested command was not found!');
         return;
     }
@@ -82,14 +90,15 @@ client.on('message', msg => {
     try {
         client.commands.get(command).execute(refs, msg, args);
     } catch (error) {
-        console.error(error);
+        winston.error('An error occurred while executing command!');
+        winston.error(error);
         msg.reply('an error has occurred, please notify bot developers.');
     }
 });
 
 // start
 client.login(config.token).catch(err => {
-    console.log('******EDIT CONFIG.JSON TO CONTINUE******');
-    console.log(err);
+    winston.info('******EDIT CONFIG.JSON TO CONTINUE******');
+    winston.error(err);
     process.exit(0);
 });
