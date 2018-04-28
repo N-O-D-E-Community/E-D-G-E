@@ -32,7 +32,7 @@ client.on('message', msg => {
 	}
 
 	try {
-		client.commands.get(command).execute(msg, args);
+		client.commands.get(command).execute(config, client, msg, args);
 	} catch (error) {
 		console.error(error);
 		msg.reply('Error :/');

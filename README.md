@@ -13,7 +13,8 @@ A Discord bot for the N-O-D-E community
  ```json
  {
  "token": "YOUR_TOKEN",
- "prefix": "YOUR_PREFIX"
+ "prefix": "YOUR_PREFIX",
+ "owner": "YOUR_ID"
  }
  ```
  
