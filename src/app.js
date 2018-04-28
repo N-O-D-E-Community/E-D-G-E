@@ -16,7 +16,7 @@ try{
 	config.prefix = "!";
 	config.token = "insert-token-here";
 	config.owner = "insert-id-here";
-  fs.writeFileSync(filePath, JSON.stringify(config),
+  fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"),
   function (err) { console.log(err ? 'Error :'+err : 'ok') });
 
   console.log("Please edit " + filePath + " and restart the app.");
