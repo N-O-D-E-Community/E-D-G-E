@@ -6,10 +6,14 @@ module.exports = {
         if (msg.author.id === refs.config.owner) {
             msg.channel.send('Stopping.');
             global.winston.info('Stopping.');
-            refs.client.destroy();
+            setTimeout(() => {
+                refs.unsub();
+                refs.client.destroy();
+                process.exit(0)
+            }, 1000);
         } else {
             global.winston.debug('Message author not authorized to use stop command, username: ', msg.author.username);
-            msg.channel.send('Unauthorized!');
+            msg.channel.send('you are not nauthorized to run this command!');
         }
     }
 };

@@ -1,6 +1,6 @@
 const winston = require('winston');
 winston.add(winston.transports.File, { filename: "edge.log" });
-winston.level = 'debug'; //TODO: set to info in production
+winston.level = 'silly'; //TODO: set to info in production
 
 global.winston = winston;
 
@@ -54,13 +54,32 @@ admin.initializeApp({
 const database = admin.firestore();
 /* END FIREBASE */
 
+
+//BOT MODERATORS
+global.edgemods = [];
+database.collection('moderators').onSnapshot((snapshot) => {
+    winston.debug('Collection moderators changed, updating');
+    global.edgemods = [];
+    snapshot.forEach(doc => {
+        global.edgemods.push(doc.data());
+    })
+}, (error) => {
+    winston.error('Error getting collection moderators');
+    winston.error(error);
+});
+const unsub = function() {
+    winston.debug('Unsubscribing...');
+    database.collection('moderators').onSnapshot(() => {});
+};
+
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
 
 const refs = {
     "config": config,
     "client": client,
-    "database": database
+    "database": database,
+    "unsub": unsub
 };
 
 client.commands = new Discord.Collection();
