@@ -5,9 +5,9 @@ module.exports = {
     name: 'link',
     description: 'Checks and adds link to the database',
     execute(refs, msg, args) {
-        if(validUrl.isUri(args[0])) {
-            urlExists(args[0]).then(function(response) {
-                if(response) {
+        if (validUrl.isUri(args[0])) {
+            urlExists(args[0]).then(function (response) {
+                if (response) {
                     let collectionRef = refs.database.collection('links');
                     collectionRef.where('link', '==', args[0]).get().then(snapshot => {
                         let doesExist = false;

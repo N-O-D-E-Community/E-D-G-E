@@ -1,39 +1,41 @@
 console.log("starting E-D-G-E.. ");
 
+const path = require('path');
 const fs = require('fs');
-
-// load config, create template if file doesn't exist
-try{
-	var config = require("../run/config.json");
-} catch(e){
-  let filePath = process.cwd() + "\\run\\config.json";
-  if(fs.existsSync(filePath)){
-    console.log("Your config file is invalid. Please edit " + filePath);
-    process.exit(1);
-  }
-	console.log("No config file found, creating a template.");
-	let config = {};
-
-  // add more key-value pairs here in the future
-	config.token = "YOUR_TOKEN";
-	config.prefix = "YOUR_PREFIX";
-	config.owner = "YOUR_ID";
-  config.databaseURL = "FIREBASEIO_DATABASE_URL";
-
-  fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
-
-  console.log("Please edit " + filePath + " and restart the app.");
-	process.exit(1);
-}
-//TODO add more config validation ("do these values even make sense?")
-// config is valid, moving on
-
+let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const admin = require('firebase-admin');
+const serviceAccount = require("../run/serviceAccountKey.json");
+
+// load config, create template if file doesn't exist
+try {
+    config = require("../run/config.json");
+} catch (e) {
+    let filePath = path.join(process.cwd(), "./run/config.json");
+    if (fs.existsSync(filePath)) {
+        console.log("Your config file is invalid. Please edit " + filePath);
+        process.exit(1);
+    }
+    console.log("No config file found, creating a template.");
+    config = {
+        "token": "YOUR_TOKEN",
+        "prefix": "YOUR_PREFIX",
+        "owner": "YOUR_SNOWFLAKE_ID",
+        "databaseURL": "FIREBASEIO_DATABASE_URL"
+    };
+
+    fs.writeFileSync(filePath, JSON.stringify(config, null, "\t")).catch(error => {
+        console.log(error ? 'Error :' + error : 'ok');
+    });
+
+    console.log("Please edit " + filePath + " and restart the app.");
+    process.exit(1);
+}
+//TODO: add more config validation ("do these values even make sense?")
+// config is valid, moving on
 
 /* FIREBASE */
-const admin  = require('firebase-admin');
-const serviceAccount = require("../run/serviceAccountKey.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: config.databaseURL
@@ -45,40 +47,40 @@ const database = admin.firestore();
 const cmdFiles = fs.readdirSync('./src/cmd');
 
 const refs = {
-	"config": config,
-	"client": client,
-	"database": database
+    "config": config,
+    "client": client,
+    "database": database
 };
 
 client.commands = new Discord.Collection();
 for (const file of cmdFiles) {
-	let cmd = require(`./cmd/${file}`);
-	client.commands.set(cmd.name, cmd);
+    let cmd = require(`./cmd/${file}`);
+    client.commands.set(cmd.name, cmd);
 }
 
 // events
 client.on('ready', () => {
-	console.log("OK!");
+    console.log("OK!");
 });
 
 client.on('message', msg => {
-	if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
+    if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
 
-	// parses command arguments
-	const args = msg.content.slice(config.prefix.length).split(/ +/);
-	const command = args.shift().toLowerCase();
+    // parses command arguments
+    const args = msg.content.slice(config.prefix.length).split(/ +/);
+    const command = args.shift().toLowerCase();
 
-	if (!client.commands.has(command)){
-		msg.reply("There is no such command!");
-		return;
-	}
+    if (!client.commands.has(command)) {
+        msg.reply("There is no such command!");
+        return;
+    }
 
-	try {
-		client.commands.get(command).execute(refs , msg, args);
-	} catch (error) {
-		console.error(error);
-		msg.reply('Error :/');
-	}
+    try {
+        client.commands.get(command).execute(refs, msg, args);
+    } catch (error) {
+        console.error(error);
+        msg.reply('Error :/');
+    }
 });
 
 // start
