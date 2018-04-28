@@ -1,5 +1,15 @@
 console.log("starting E-D-G-E.. ");
 
+/* FIREBASE */
+const admin  = require('firebase-admin');
+const serviceAccount = require("../run/serviceAccountKey.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://e-d-g-e.firebaseio.com"
+});
+const database = admin.firestore();
+/* END FIREBASE */
+
 const fs = require('fs');
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -7,6 +17,12 @@ let config = require("../run/config.json");
 
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
+
+const refs = {
+	"config": config,
+	"client": client,
+	"database": database
+};
 
 client.commands = new Discord.Collection();
 for (const file of cmdFiles) {
@@ -32,7 +48,7 @@ client.on('message', msg => {
 	}
 
 	try {
-		client.commands.get(command).execute(config, client, msg, args);
+		client.commands.get(command).execute(refs , msg, args);
 	} catch (error) {
 		console.error(error);
 		msg.reply('Error :/');

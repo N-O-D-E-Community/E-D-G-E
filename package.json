@@ -6,7 +6,10 @@
   "author": "N-O-D-E Community",
   "license": "GPL-3.0",
   "dependencies": {
-    "discord.js": "^11.3.2"
+    "discord.js": "^11.3.2",
+    "firebase-admin": "^5.12.0",
+    "url-exists-deep": "^1.1.0",
+    "valid-url": "^1.0.9"
   },
   "devDependencies": {},
   "scripts": {
