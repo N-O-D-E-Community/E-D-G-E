@@ -15,9 +15,10 @@ try{
 	let config = {};
 
   // add more key-value pairs here in the future
-	config.prefix = "!";
-	config.token = "insert-token-here";
-	config.owner = "insert-id-here";
+	config.token = "YOUR_TOKEN";
+	config.prefix = "YOUR_PREFIX";
+	config.owner = "YOUR_ID";
+  config.databaseURL = "FIREBASEIO_DATABASE_URL";
 
   fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"),
   function (err) { console.log(err ? 'Error :'+err : 'ok') });
