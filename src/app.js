@@ -20,8 +20,7 @@ try{
 	config.owner = "YOUR_ID";
   config.databaseURL = "FIREBASEIO_DATABASE_URL";
 
-  fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"),
-  function (err) { console.log(err ? 'Error :'+err : 'ok') });
+  fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
 
   console.log("Please edit " + filePath + " and restart the app.");
 	process.exit(1);
