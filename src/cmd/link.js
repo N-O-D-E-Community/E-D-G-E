@@ -26,8 +26,10 @@ module.exports = {
                         }
                     });
                 } else {
-                    msg.reply("link is not reachable!")
+                    msg.reply('link is not reachable!');
                 }
+            }).catch(error => {
+                msg.reply('link is not reachable!');
             });
         } else {
             msg.reply("link is in invalid format!");
