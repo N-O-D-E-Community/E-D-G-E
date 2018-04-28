@@ -1,9 +1,22 @@
 console.log("starting E-D-G-E.. ");
 
+// load config, create template if file doesn't exist
 const fs = require('fs');
+try{
+	var config = require("../run/config.json");
+} catch(e){
+	console.log("No config file found, creating a template.");
+	let config = {};
+	config.prefix = "!";
+	config.token = "insert-token-here";
+	config.owner = "insert-id-here";
+
+	console.log("Please edit " + filePath + " and restart the app.");
+	exit(0);
+}
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
-let config = require("../run/config.json");
 
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
