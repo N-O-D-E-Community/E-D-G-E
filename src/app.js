@@ -25,12 +25,14 @@ try {
         "databaseURL": "FIREBASEIO_DATABASE_URL"
     };
 
-    fs.writeFileSync(filePath, JSON.stringify(config, null, "\t")).catch(error => {
-        console.log(error ? 'Error :' + error : 'ok');
-    });
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
+    } catch(error) {
+        console.log(error);
+    }
 
     console.log("Please edit " + filePath + " and restart the app.");
-    process.exit(1);
+    process.exit(0);
 }
 //TODO: add more config validation ("do these values even make sense?")
 // config is valid, moving on
@@ -84,4 +86,8 @@ client.on('message', msg => {
 });
 
 // start
-client.login(config.token);
+client.login(config.token).catch(err => {
+    console.log("PLEASE CHANGE TOKEN AND OTHER FIELDS IN CONFIG.JSON TO CONTINUE");
+    console.log(err);
+    process.exit(0);
+});
