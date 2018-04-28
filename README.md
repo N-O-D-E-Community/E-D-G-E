@@ -14,7 +14,8 @@ A Discord bot for the N-O-D-E community
  {
  "token": "YOUR_TOKEN",
  "prefix": "YOUR_PREFIX",
- "owner": "YOUR_ID"
+ "owner": "YOUR_ID",
+ "databaseURL": "FIREBASEIO_DATABASE_URL"
  }
  ```
  

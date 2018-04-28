@@ -1,19 +1,19 @@
 console.log("starting E-D-G-E.. ");
 
+const fs = require('fs');
+const Discord = require('discord.js');
+const client = new Discord.Client();
+let config = require("../run/config.json");
+
 /* FIREBASE */
 const admin  = require('firebase-admin');
 const serviceAccount = require("../run/serviceAccountKey.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://e-d-g-e.firebaseio.com"
+    databaseURL: config.databaseURL
 });
 const database = admin.firestore();
 /* END FIREBASE */
-
-const fs = require('fs');
-const Discord = require('discord.js');
-const client = new Discord.Client();
-let config = require("../run/config.json");
 
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
