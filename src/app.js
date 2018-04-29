@@ -28,10 +28,31 @@ try {
     }
     winston.info('No config file found, creating a template.');
     config = {
-        "token": "YOUR_TOKEN",
-        "prefix": "YOUR_PREFIX",
-        "owner": "YOUR_SNOWFLAKE_ID",
-        "databaseURL": "FIREBASEIO_DATABASE_URL"
+        "discord": {
+            "token": "MY_BOT_USER_TOKEN",
+            "prefix": "MY_PREFIX",
+            "owner": "MY_SNOWFLAKE_ID"
+        },
+        "firebase": {
+            "databaseURL": "https://MY_PROJECT_NAME.firebaseio.com"
+        },
+        "email": {
+            "hostnameBlacklist": [
+                "example.com"
+            ],
+            "ownerEmail": "admin@example.com",
+            "from": "\"E-D-G-E\" <e-d-g-e@MY_DOMAIN.TLD>",
+            "to": "testing@example.com, testing2@example.com",
+            "smtp": {
+                "host": "smtp.MY_SMTP_SERVICE.TLD",
+                "port": 587,
+                "secure": false,
+                "auth": {
+                    "user": "MY_SMTP_USER",
+                    "pass": "MY_SMTP_PASSWORD"
+                }
+            }
+        }
     };
 
     winston.debug('Creating config.json');
@@ -49,7 +70,7 @@ try {
 /* FIREBASE */
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: config.databaseURL
+    databaseURL: config.firebase.databaseURL
 });
 const database = admin.firestore();
 /* END FIREBASE */
@@ -75,18 +96,19 @@ const unsub = function() {
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
 
+let commands = new Discord.Collection();
+for (const file of cmdFiles) {
+    let cmd = require(`./cmd/${file}`);
+    commands.set(cmd.name, cmd);
+}
+
 const refs = {
     "config": config,
     "client": client,
     "database": database,
-    "unsub": unsub
+    "unsub": unsub,
+    "commands": commands
 };
-
-client.commands = new Discord.Collection();
-for (const file of cmdFiles) {
-    let cmd = require(`./cmd/${file}`);
-    client.commands.set(cmd.name, cmd);
-}
 
 // events
 client.on('ready', () => {
@@ -94,20 +116,20 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-    if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
+    if (!msg.content.startsWith(config.discord.prefix) || msg.author.bot) return;
 
     // parses command arguments
-    const args = msg.content.slice(config.prefix.length).split(/ +/);
+    const args = msg.content.slice(config.discord.prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (!client.commands.has(command)) {
+    if (!commands.has(command)) {
         winston.debug('User ', msg.author.username, ' tried to execute non-existing command');
         msg.reply('requested command was not found!');
         return;
     }
 
     try {
-        client.commands.get(command).execute(refs, msg, args);
+        commands.get(command).execute(refs, msg, args);
     } catch (error) {
         winston.error('An error occurred while executing command!');
         winston.error(error);
@@ -116,7 +138,7 @@ client.on('message', msg => {
 });
 
 // start
-client.login(config.token).catch(err => {
+client.login(config.discord.token).catch(err => {
     winston.info('******EDIT CONFIG.JSON TO CONTINUE******');
     winston.error(err);
     process.exit(0);

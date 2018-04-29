@@ -17,6 +17,8 @@ A Discord bot for the N-O-D-E community
  - Run `npm start`(in the root project directory) once and edit `./run/config.json` with your values
  - Run `npm start` to run the bot
  
+ Note: You will also need an SMTP service to send e-mails, you can use SendGrid, Mailgun or other similar services.
+ 
 ### Rules
  
  - Make new branches when making changes

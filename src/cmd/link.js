@@ -1,3 +1,5 @@
+/*Author: D3add3d */
+
 const validUrl = require('valid-url');
 const urlExists = require('url-exists-deep');
 
@@ -8,6 +10,14 @@ module.exports = {
         global.winston.debug('Link command executed', args[0]);
         if (validUrl.isUri(args[0])) {
             global.winston.debug('Link is a valid URI');
+
+            let url = new URL(args[0]);
+            if(refs.config.email.hostnameBlacklist.includes(url.hostname)) {
+                msg.reply('that hostname is blacklisted!');
+                global.winston.info('User ' + msg.author.username + ' tried to add blacklisted link!');
+                return;
+            }
+
             // noinspection JSUnresolvedFunction
             urlExists(args[0]).then(function (response) {
                 global.winston.debug('HTTP/S response returned for link');
@@ -42,6 +52,8 @@ module.exports = {
                 global.winston.debug('Server not found, ignoring link');
                 msg.reply('link is not reachable!');
             });
+
+
         } else {
             global.winston.debug("Link's format is invalid, ignoring");
             msg.reply('link is in invalid format!');

@@ -1,10 +1,12 @@
+/* Author: D3ad3dd */
+
 const nodemailer = require('nodemailer');
 
 module.exports = {
     name: "sendlinks",
     description: "Sends saved links to N-O-D-E",
     execute(refs, msg, args) {
-        global.winston.debug('Sendlinks executed by ', msg.author.username);
+        global.winston.info('Sendlinks executed by ', msg.author.username);
         global.winston.debug(global.edgemods);
         if(global.edgemods.find(elem => {
             winston.silly(elem);
@@ -15,58 +17,61 @@ module.exports = {
             let content = "";
 
             refs.database.collection('links').where('seen', '==', false).get().then(snapshot => {
-                snapshot.forEach(doc => {
-                    let data = doc.data();
-                    let tmp = data.user + ',' + data.link + '\n';
-                    content = content + tmp;
-                    refs.database.collection('links').doc(doc.id).update({"seen": true});
-                })
-            });
+                winston.debug('Snapshot size :' + snapshot.size);
+                winston.debug('Snapshot empty:' + snapshot.empty);
+                if(!snapshot.empty) {
+                    snapshot.forEach(doc => {
+                        let data = doc.data();
+                        let tmp = data.user + ',' + data.link + '\n';
+                        content = content + tmp;
+                        refs.database.collection('links').doc(doc.id).update({"seen": true});
+                    });
 
-
-            // Generate test SMTP service account from ethereal.email
-            // Only needed if you don't have a real mail account for testing
-            nodemailer.createTestAccount((err, account) => {
-                // create reusable transporter object using the default SMTP transport
-                let transporter = nodemailer.createTransport({
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    secure: false, // true for 465, false for other ports
-                    auth: {
-                        user: account.user, // generated ethereal user
-                        pass: account.pass // generated ethereal password
-                    }
-                });
-
-                // setup email data with unicode symbols
-                let mailOptions = {
-                    from: '"E-D-G-E" <e-d-g-e@d3add3d.net>', // sender address
-                    to: 'links@n-o-d-e.net', // list of receivers
-                    subject: '[E-D-G-E] <' + new Date().toDateString() + '> Collection of links from the N-O-D-E community Discord server', // Subject line
-                    text: 'The attachment contains a list of links submitted by the members of N-O-D-E community Discord server.\n - Beep-boop-boop, E-D-G-E', // plain text body
-                    html: 'The attachment contains a list of links submitted by the members of N-O-D-E community Discord server.<br> - Beep-boop-boop, E-D-G-E', // html body
-                    attachments: [
-                        {
-                            filename: 'links.csv',
-                            content: content,
-                            contentType: 'text/plain'
+                    /* NODEMAILER START */
+                    let transporter = nodemailer.createTransport({
+                        host: refs.config.email.smtp.host,
+                        port: refs.config.email.smtp.port,
+                        secure: refs.config.email.smtp.secure,
+                        auth: {
+                            user: refs.config.email.smtp.auth.user,
+                            pass: refs.config.email.smtp.auth.pass
                         }
-                    ]
-                };
+                    });
 
-                // send mail with defined transport object
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        return console.log(error);
-                    }
-                    console.log('Message sent: %s', info.messageId);
-                    // Preview only available when sending through an Ethereal account
-                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                    // setup email data with unicode symbols
+                    let mailOptions = {
+                        from: refs.config.email.from, // sender address
+                        to: refs.config.email.to, // list of receivers //links@n-o-d-e.net
+                        subject: '[E-D-G-E] <' + new Date().toDateString() + '> Collection of links from the N-O-D-E community Discord server', // Subject line
+                        text: 'Hello,\nI am E-D-G-E, a bot on the N-O-D-E community unofficial Discord server.\nThe attachment contains a list of links submitted by the members of N-O-D-E community unofficial Discord server.\nIf the list contains any hostnames that slipped my filter(e.g. NSFW content) please contact an administrator(' + refs.config.email.ownerEmail + ') listing the hostnames you want filtered in the e-mail and the bot administrator will add them to the blacklist, thanks!\n\n - Beep-boop-boop, E-D-G-E\n\n\n(This e-mail was sent because command "sendlinks" was executed by \' + msg.author.username +\' on Discord, the user was authorized by snowflake ID: \' + msg.author.id +\')\'', // plain text body
+                        html: 'Hello,<br>I am E-D-G-E, a bot on the N-O-D-E community unofficial Discord server.<br>The attachment contains a list of links submitted by the members of N-O-D-E community unofficial Discord server.<br>If the list contains any hostnames that slipped my filter(e.g. NSFW content) please contact an administrator(' + refs.config.email.ownerEmail + ') listing the hostnames you want filtered in the e-mail and the bot administrator will add them to the blacklist, thanks!<br><br> - Beep-boop-boop, E-D-G-E<br><br><br><i>(This e-mail was sent because command "sendlinks" was executed by ' + msg.author.username + ' on Discord, the user was authorized by snowflake ID: ' + msg.author.id + ')</i>', // html body
+                        attachments: [
+                            {
+                                filename: 'links-' + new Date().toDateString() + '.csv',
+                                content: content,
+                                contentType: 'text/plain'
+                            }
+                        ]
+                    };
 
-                    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-                    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-                    msg.reply('links sent!');
-                });
+                    // send mail with defined transport object
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            winston.error('Unable to send e-mail');
+                            msg.reply('I was unable to send the e-mail, please contact my developers and include the log.');
+                            return winston.error(error);
+                        }
+
+                        winston.info('Sendlinks executed successfully!')
+                        msg.reply('links sent!');
+                    });
+                    /* NODEMAILER END */
+
+
+                } else {
+                    winston.info('Snapshot empty, not sending.')
+                    msg.reply('there is nothing to send.')
+                }
             });
 
         } else {

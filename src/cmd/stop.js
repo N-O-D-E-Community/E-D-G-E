@@ -1,9 +1,11 @@
+/* Author: D3add3d */
+
 module.exports = {
     name: 'stop',
     description: 'Stops the bot',
     execute(refs, msg, args) {
         global.winston.debug('Stop command executed by: ', msg.author.username);
-        if (msg.author.id === refs.config.owner) {
+        if (msg.author.id === refs.config.discord.owner) {
             msg.channel.send('Stopping.');
             global.winston.info('Stopping.');
             setTimeout(() => {
@@ -13,7 +15,7 @@ module.exports = {
             }, 1000);
         } else {
             global.winston.debug('Message author not authorized to use stop command, username: ', msg.author.username);
-            msg.channel.send('you are not nauthorized to run this command!');
+            msg.channel.send('you are not authorized to run this command!');
         }
     }
 };
