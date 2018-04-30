@@ -1,4 +1,10 @@
-console.log("starting E-D-G-E.. ");
+const winston = require('winston');
+winston.add(winston.transports.File, { filename: "edge.log" });
+winston.level = 'silly'; //TODO: set to info in production
+
+global.winston = winston;
+
+winston.info('Starting E-D-G-E...');
 
 const path = require('path');
 const fs = require('fs');
@@ -6,88 +12,134 @@ let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const admin = require('firebase-admin');
-const serviceAccount = require("../run/serviceAccountKey.json");
+const serviceAccount = require('../run/serviceAccountKey.json');
 
-// load config, create template if file doesn't exist
+/*
+Try to load the config file, if it does not exist create one from template and save it
+ */
 try {
-    config = require("../run/config.json");
+    config = require('../run/config.json');
 } catch (e) {
-    let filePath = path.join(process.cwd(), "./run/config.json");
+    let filePath = path.join(process.cwd(), './run/config.json');
     if (fs.existsSync(filePath)) {
-        console.log("Your config file is invalid. Please edit " + filePath);
-        process.exit(1);
+        winston.info('Failed to load the config.json file ' + filePath);
+        winston.error(e);
+        process.exit(0);
     }
-    console.log("No config file found, creating a template.");
+    winston.info('No config file found, creating a template.');
     config = {
-        "token": "YOUR_TOKEN",
-        "prefix": "YOUR_PREFIX",
-        "owner": "YOUR_SNOWFLAKE_ID",
-        "databaseURL": "FIREBASEIO_DATABASE_URL"
+        "discord": {
+            "token": "MY_BOT_USER_TOKEN",
+            "prefix": "MY_PREFIX",
+            "owner": "MY_SNOWFLAKE_ID"
+        },
+        "firebase": {
+            "databaseURL": "https://MY_PROJECT_NAME.firebaseio.com"
+        },
+        "email": {
+            "hostnameBlacklist": [
+                "example.com"
+            ],
+            "ownerEmail": "admin@example.com",
+            "from": "\"E-D-G-E\" <e-d-g-e@MY_DOMAIN.TLD>",
+            "to": "testing@example.com, testing2@example.com",
+            "smtp": {
+                "host": "smtp.MY_SMTP_SERVICE.TLD",
+                "port": 587,
+                "secure": false,
+                "auth": {
+                    "user": "MY_SMTP_USER",
+                    "pass": "MY_SMTP_PASSWORD"
+                }
+            }
+        }
     };
 
+    winston.debug('Creating config.json');
     try {
         fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
     } catch(error) {
-        console.log(error);
+        winston.info('Failed to create config file!');
+        winston.error(error);
     }
 
-    console.log("Please edit " + filePath + " and restart the app.");
+    winston.info('Please edit ', filePath, ' and restart the app.'); //avoid type conversion by using commas instead of concat.
     process.exit(0);
 }
-//TODO: add more config validation ("do these values even make sense?")
-// config is valid, moving on
 
 /* FIREBASE */
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: config.databaseURL
+    databaseURL: config.firebase.databaseURL
 });
 const database = admin.firestore();
 /* END FIREBASE */
 
+
+//BOT MODERATORS
+global.edgemods = [];
+database.collection('moderators').onSnapshot((snapshot) => {
+    winston.debug('Collection moderators changed, updating');
+    global.edgemods = [];
+    snapshot.forEach(doc => {
+        global.edgemods.push(doc.data());
+    })
+}, (error) => {
+    winston.error('Error getting collection moderators');
+    winston.error(error);
+});
+const unsub = function() {
+    winston.debug('Unsubscribing...');
+    database.collection('moderators').onSnapshot(() => {});
+};
+
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
+
+let commands = new Discord.Collection();
+for (const file of cmdFiles) {
+    let cmd = require(`./cmd/${file}`);
+    commands.set(cmd.name, cmd);
+}
 
 const refs = {
     "config": config,
     "client": client,
-    "database": database
+    "database": database,
+    "unsub": unsub,
+    "commands": commands
 };
-
-client.commands = new Discord.Collection();
-for (const file of cmdFiles) {
-    let cmd = require(`./cmd/${file}`);
-    client.commands.set(cmd.name, cmd);
-}
 
 // events
 client.on('ready', () => {
-    console.log("OK!");
+    winston.info("E-D-G-E ready!");
 });
 
 client.on('message', msg => {
-    if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
+    if (!msg.content.startsWith(config.discord.prefix) || msg.author.bot) return;
 
     // parses command arguments
-    const args = msg.content.slice(config.prefix.length).split(/ +/);
+    const args = msg.content.slice(config.discord.prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (!client.commands.has(command)) {
-        msg.reply("There is no such command!");
+    if (!commands.has(command)) {
+        winston.debug('User ', msg.author.username, ' tried to execute non-existing command');
+        msg.reply('requested command was not found!');
         return;
     }
 
     try {
-        client.commands.get(command).execute(refs, msg, args);
+        commands.get(command).execute(refs, msg, args);
     } catch (error) {
-        console.error(error);
-        msg.reply('Error :/');
+        winston.error('An error occurred while executing command!');
+        winston.error(error);
+        msg.reply('an error has occurred, please notify bot developers.');
     }
 });
 
 // start
-client.login(config.token).catch(err => {
-    console.log("PLEASE CHANGE TOKEN AND OTHER FIELDS IN CONFIG.JSON TO CONTINUE");
-    console.log(err);
+client.login(config.discord.token).catch(err => {
+    winston.info('******EDIT CONFIG.JSON TO CONTINUE******');
+    winston.error(err);
     process.exit(0);
 });
