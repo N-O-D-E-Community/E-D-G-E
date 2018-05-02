@@ -12,7 +12,14 @@ let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const admin = require('firebase-admin');
-const serviceAccount = require('../run/serviceAccountKey.json');
+
+let serviceAccount = null;
+
+try {
+    serviceAccount = require('../run/serviceAccountKey.json');
+} catch (e) {
+    winston.error('Could not load serviceAccountKey.json, is it there? Is it readable?');
+}
 
 /*
 Try to load the config file, if it does not exist create one from template and save it
