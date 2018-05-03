@@ -67,7 +67,6 @@ module.exports = {
                     });
                     /* NODEMAILER END */
 
-
                 } else {
                     winston.info('Snapshot empty, not sending.')
                     msg.reply('there is nothing to send.')
