@@ -1,6 +1,6 @@
 const winston = require('winston');
 winston.add(winston.transports.File, { filename: "edge.log" });
-winston.level = 'silly'; //TODO: set to info in production
+winston.level = 'info'; //TODO: set to info in production
 
 global.winston = winston;
 
@@ -12,12 +12,22 @@ let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const admin = require('firebase-admin');
-const serviceAccount = require('../run/serviceAccountKey.json');
+
+let serviceAccount = null;
+
+try {
+    // noinspection JSFileReferences
+    serviceAccount = require('../run/serviceAccountKey.json');
+} catch (e) {
+    winston.error('Could not load serviceAccountKey.json, is it there? Is it readable?');
+    process.exit(0);
+}
 
 /*
 Try to load the config file, if it does not exist create one from template and save it
  */
 try {
+    // noinspection JSFileReferences
     config = require('../run/config.json');
 } catch (e) {
     let filePath = path.join(process.cwd(), './run/config.json');
@@ -59,8 +69,9 @@ try {
     try {
         fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
     } catch(error) {
-        winston.info('Failed to create config file!');
-        winston.error(error);
+        winston.error('Failed to create config file! Most probably missing permissions.');
+        process.exit(0);
+        //winston.error(error);
     }
 
     winston.info('Please edit ', filePath, ' and restart the app.'); //avoid type conversion by using commas instead of concat.

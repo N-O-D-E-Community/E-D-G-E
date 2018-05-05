@@ -17,8 +17,6 @@ module.exports = {
                 return;
             }
 
-
-
             if(args[0] === 'add' && msg.mentions.users.array().length > 0) {
                 let mentions = msg.mentions.users.array();
                 mentions.forEach(mention => {
@@ -56,8 +54,6 @@ module.exports = {
                     });
                 });
             }
-
-
 
         } else {
             global.winston.info('User ' + msg.author.username + ' tried to execute command mod without permissions.');
