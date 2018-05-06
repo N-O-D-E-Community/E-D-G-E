@@ -140,7 +140,22 @@ client.on('message', msg => {
     }
 
     try {
-        commands.get(command).execute(refs, msg, args);
+        let cmd = commands.get(command);
+        let type = '';
+
+        if(msg.author.id === refs.config.discord.owner) {
+            type = 2; //owner
+        } else if(global.edgemods.find(elem => { return elem.snowflake === msg.author.id; })) {
+            type = 1; //mod
+        } else {
+            type = 0; //regular
+        }
+
+        if(type >= cmd['type']) {
+            cmd.execute(refs, msg, args);
+        } else {
+            msg.reply('you are not authorized to use this command!');
+        }
     } catch (error) {
         winston.error('An error occurred while executing command!');
         winston.error(error);
