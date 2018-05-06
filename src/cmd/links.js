@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 module.exports = {
     name: "links",
     description: "`send`s or `list`s links that have not yet been sent",
+    type: 1,
     execute(refs, msg, args) {
         global.winston.info('links executed by ', msg.author.username);
         global.winston.debug(global.edgemods);

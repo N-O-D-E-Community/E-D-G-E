@@ -6,6 +6,7 @@ const urlExists = require('url-exists-deep');
 module.exports = {
     name: 'link',
     description: 'Checks and adds link to the database',
+    type: 0,
     execute(refs, msg, args) {
         global.winston.debug('Link command executed', args[0]);
         if (validUrl.isUri(args[0])) {
@@ -46,17 +47,17 @@ module.exports = {
                     });
                 } else {
                     global.winston.debug('Server responded but link is not reachable, ignoring');
-                    msg.reply('link is not reachable!');
+                    msg.reply('given URL does not exist on that server!');
                 }
             }).catch(error => {
                 global.winston.debug('Server not found, ignoring link');
-                msg.reply('link is not reachable!');
+                msg.reply('given URI is pointing to a server that does not exist!');
             });
 
 
         } else {
-            global.winston.debug("Link's format is invalid, ignoring");
-            msg.reply('link is in invalid format!');
+            global.winston.debug("Not an URI, ignoring");
+            msg.reply('that link is not a valid URI!');
         }
     }
 

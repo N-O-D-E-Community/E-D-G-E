@@ -3,6 +3,7 @@
 module.exports = {
     name: 'mod',
     description: 'Adds and removes moderators',
+    type: 1,
     execute(refs, msg, args) {
         global.winston.debug('Mod command executed by: ', msg.author.username);
         global.winston.debug(global.edgemods);
