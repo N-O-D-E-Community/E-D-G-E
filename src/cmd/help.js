@@ -1,5 +1,6 @@
 /* Author: D3add3d */
 
+const Permissions = require("discord.js/src/util/Permissions");
 module.exports = {
     name: 'help',
     description: 'Lists all commands',
@@ -10,7 +11,7 @@ module.exports = {
 
         if(msg.author.id === refs.config.discord.owner) {
             type = 2; //owner
-        } else if(global.edgemods.find(elem => { return elem.snowflake === msg.author.id; })) {
+        } else if(msg.member ? msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) {
             type = 1; //mod
         } else {
             type = 0; //regular
