@@ -12,6 +12,7 @@ let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const admin = require('firebase-admin');
+const Permissions = require("discord.js/src/util/Permissions");
 
 let serviceAccount = null;
 
@@ -86,24 +87,6 @@ admin.initializeApp({
 const database = admin.firestore();
 /* END FIREBASE */
 
-
-//BOT MODERATORS
-global.edgemods = [];
-database.collection('moderators').onSnapshot((snapshot) => {
-    winston.debug('Collection moderators changed, updating');
-    global.edgemods = [];
-    snapshot.forEach(doc => {
-        global.edgemods.push(doc.data());
-    })
-}, (error) => {
-    winston.error('Error getting collection moderators');
-    winston.error(error);
-});
-const unsub = function() {
-    winston.debug('Unsubscribing...');
-    database.collection('moderators').onSnapshot(() => {});
-};
-
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
 
@@ -117,7 +100,6 @@ const refs = {
     "config": config,
     "client": client,
     "database": database,
-    "unsub": unsub,
     "commands": commands
 };
 
@@ -141,21 +123,20 @@ client.on('message', msg => {
 
     try {
         let cmd = commands.get(command);
-        let type = '';
 
-        if(msg.author.id === refs.config.discord.owner) {
-            type = 2; //owner
-        } else if(global.edgemods.find(elem => { return elem.snowflake === msg.author.id; })) {
-            type = 1; //mod
-        } else {
-            type = 0; //regular
+        winston.debug('command type: ' + cmd['type']);
+
+        switch(cmd['type']) {
+            case 2:
+                msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply('you are not authorized to use this command!');
+                break;
+            case 1:
+                (msg.author.id === refs.config.discord.owner || msg.member ? msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) ? cmd.execute(refs, msg, args) : msg.reply('you are not authorized to use this command!');
+                break;
+            default:
+                cmd.execute(refs, msg, args);
         }
 
-        if(type >= cmd['type']) {
-            cmd.execute(refs, msg, args);
-        } else {
-            msg.reply('you are not authorized to use this command!');
-        }
     } catch (error) {
         winston.error('An error occurred while executing command!');
         winston.error(error);

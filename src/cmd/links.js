@@ -7,7 +7,7 @@ module.exports = {
     description: "`send`s or `list`s links that have not yet been sent",
     type: 1,
     execute(refs, msg, args) {
-        global.winston.info('links executed by ', msg.author.username);
+        global.winston.info('links executed by',msg.author.username);
         let content = "";
 
         if(args[0] === 'send') {
@@ -54,7 +54,7 @@ module.exports = {
                     transporter.sendMail(mailOptions, (error, info) => {
                         if (error) {
                             winston.error('Unable to send e-mail');
-                            msg.reply('I was unable to send the e-mail, please contact my developers and include the log.');
+                            msg.reply('I was unable to send the e-mail, please contact my developers and administrator.');
                             return winston.error(error);
                         }
 
