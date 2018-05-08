@@ -1,4 +1,6 @@
 # E-D-G-E
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E?ref=badge_shield)
+
 A Discord bot for the N-O-D-E community
 
 ## Contributing
@@ -23,3 +25,7 @@ A Discord bot for the N-O-D-E community
  - Make new branches when making changes
  - Pull requests should stay open until someone reviews them
  - Merging into `master` can only be completed after all new features and changes have been tested and reviewed
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E?ref=badge_large)
