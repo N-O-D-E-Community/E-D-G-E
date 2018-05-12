@@ -17,9 +17,23 @@ A Discord bot for the N-O-D-E community
  - Run `npm start` to run the bot
  
  Note: You will also need an SMTP service to send e-mails, you can use SendGrid, Mailgun or other similar services.
- 
+
 ### Rules
  
  - Make new branches when making changes
  - Pull requests should stay open until someone reviews them
  - Merging into `master` can only be completed after all new features and changes have been tested and reviewed
+ 
+ ---
+ 
+## Using the Bot
+- Send commands by putting the prefix specified in `run/config.json` at the start of a message
+- The `help` command will DM you a list of all commands to get you started
+
+### Permissions
+The permission level required to execute a command:
+- Level 0: Anyone
+- Level 1: Moderators. This will include every user with the `MANAGE_MESSAGES`
+- Level 2: Owner only. Those commands are restricted to the bot owner defined in `config.json`
+
+You can add a Moderator by granting the `MANAGE_MESSAGES` permission in your Discord server settings. This can be done with roles or channel-specific permissions. Note that channel permissions will override role permissions. 
