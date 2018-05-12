@@ -13,7 +13,7 @@ A Discord bot for the N-O-D-E community
  - Obtain a `serviceAccountKey.json` file from Firebase by logging in to the Firebase console, creating a project, enabling Cloud Firestore under "Database" and going to "Project settings > SERVICE ACCOUNTS" and clicking on "GENERATE NEW PRIVATE KEY"
  - Put the obtained file into `run` directory in the root directoy of the project
  - Obtain your snowflake ID by going to "User Settings > APP SETTINGS > Appearance", enabling "Developer Mode", right-clicking on your name in any server and choosing "Copy ID"
- - Run `npm start`(in the root project directory) once and edit `./run/config.json` with your values
+ - Run `npm start`(in the root project directory) once and edit `run/config.json` with your values
  - Run `npm start` to run the bot
  
  Note: You will also need an SMTP service to send e-mails, you can use SendGrid, Mailgun or other similar services.
@@ -27,13 +27,8 @@ A Discord bot for the N-O-D-E community
  ---
  
 ## Using the Bot
-- Send commands by putting the prefix specified in `run/config.json` at the start of a message
-- The `help` command will DM you a list of all commands to get you started
+- To execute commands you will need to prefix them with the character or string you set in `run/config.json`
+- To see a list of all commands available to you execute the `help` command
 
 ### Permissions
-The permission level required to execute a command:
-- Level 0: Anyone
-- Level 1: Moderators. This will include every user with the `MANAGE_MESSAGES`
-- Level 2: Owner only. Those commands are restricted to the bot owner defined in `config.json`
-
-You can add a Moderator by granting the `MANAGE_MESSAGES` permission in your Discord server settings. This can be done with roles or channel-specific permissions. Note that channel permissions will override role permissions. 
+Some commands can only be executed by users with the `MANAGE_MESSAGES` permission on a server, this permission tells the bot that the user is a moderator. There is also a `stop` command that can only be executed by the bot owner identified by the snowflake ID set in `run/config.json`.
