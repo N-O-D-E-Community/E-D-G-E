@@ -15,16 +15,23 @@ A Discord bot for the N-O-D-E community
  - Obtain a `serviceAccountKey.json` file from Firebase by logging in to the Firebase console, creating a project, enabling Cloud Firestore under "Database" and going to "Project settings > SERVICE ACCOUNTS" and clicking on "GENERATE NEW PRIVATE KEY"
  - Put the obtained file into `run` directory in the root directoy of the project
  - Obtain your snowflake ID by going to "User Settings > APP SETTINGS > Appearance", enabling "Developer Mode", right-clicking on your name in any server and choosing "Copy ID"
- - Run `npm start`(in the root project directory) once and edit `./run/config.json` with your values
+ - Run `npm start`(in the root project directory) once and edit `run/config.json` with your values
  - Run `npm start` to run the bot
  
  Note: You will also need an SMTP service to send e-mails, you can use SendGrid, Mailgun or other similar services.
- 
+
 ### Rules
  
  - Make new branches when making changes
  - Pull requests should stay open until someone reviews them
  - Merging into `master` can only be completed after all new features and changes have been tested and reviewed
+ 
+## Using the Bot
+- To execute commands you will need to prefix them with the character or string you set in `run/config.json`
+- To see a list of all commands available to you execute the `help` command
+
+### Permissions
+Some commands can only be executed by users with the `MANAGE_MESSAGES` permission on a server, this permission tells the bot that the user is a moderator. There is also a `stop` command that can only be executed by the bot owner identified by the snowflake ID set in `run/config.json`.
 
 
 ## License

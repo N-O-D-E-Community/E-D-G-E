@@ -9,7 +9,6 @@ module.exports = {
         msg.channel.send('Stopping.');
         global.winston.info('Stopping.');
         setTimeout(() => {
-            refs.unsub();
             refs.client.destroy();
             process.exit(0)
         }, 1000);
