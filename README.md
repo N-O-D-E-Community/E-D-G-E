@@ -1,4 +1,6 @@
 # E-D-G-E
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E?ref=badge_shield)
+
 A Discord bot for the N-O-D-E community
 
 ## Contributing
@@ -24,11 +26,13 @@ A Discord bot for the N-O-D-E community
  - Pull requests should stay open until someone reviews them
  - Merging into `master` can only be completed after all new features and changes have been tested and reviewed
  
- ---
- 
 ## Using the Bot
 - To execute commands you will need to prefix them with the character or string you set in `run/config.json`
 - To see a list of all commands available to you execute the `help` command
 
 ### Permissions
 Some commands can only be executed by users with the `MANAGE_MESSAGES` permission on a server, this permission tells the bot that the user is a moderator. There is also a `stop` command that can only be executed by the bot owner identified by the snowflake ID set in `run/config.json`.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FN-O-D-E-Community%2FE-D-G-E?ref=badge_large)
