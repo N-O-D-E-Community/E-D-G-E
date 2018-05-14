@@ -3,23 +3,19 @@
 const nodemailer = require('nodemailer');
 
 module.exports = {
-    name: "sendlinks",
-    description: "Sends saved links to N-O-D-E",
+    name: "links",
+    description: "`send`s or `list`s links that have not yet been sent",
+    type: 1,
     execute(refs, msg, args) {
-        global.winston.info('Sendlinks executed by ', msg.author.username);
-        global.winston.debug(global.edgemods);
-        if(global.edgemods.find(elem => {
-            winston.silly(elem);
-            return elem.snowflake === msg.author.id;
-        })) {
-            global.winston.debug('snowflake match');
+        global.winston.info('links executed by',msg.author.username);
+        let content = "";
 
-            let content = "";
+        if(args[0] === 'send') {
 
             refs.database.collection('links').where('seen', '==', false).get().then(snapshot => {
                 winston.debug('Snapshot size :' + snapshot.size);
                 winston.debug('Snapshot empty:' + snapshot.empty);
-                if(!snapshot.empty) {
+                if (!snapshot.empty) {
                     snapshot.forEach(doc => {
                         let data = doc.data();
                         let tmp = data.user + ',' + data.link + '\n';
@@ -58,7 +54,7 @@ module.exports = {
                     transporter.sendMail(mailOptions, (error, info) => {
                         if (error) {
                             winston.error('Unable to send e-mail');
-                            msg.reply('I was unable to send the e-mail, please contact my developers and include the log.');
+                            msg.reply('I was unable to send the e-mail, please contact my developers and administrator.');
                             return winston.error(error);
                         }
 
@@ -67,16 +63,30 @@ module.exports = {
                     });
                     /* NODEMAILER END */
 
-
                 } else {
                     winston.info('Snapshot empty, not sending.')
                     msg.reply('there is nothing to send.')
                 }
             });
+        } else if(args[0] === 'list') {
+            refs.database.collection('links').where('seen', '==', false).get().then(snapshot => {
+                winston.debug('Snapshot size :' + snapshot.size);
+                winston.debug('Snapshot empty:' + snapshot.empty);
+                if (!snapshot.empty) {
+                    snapshot.forEach(doc => {
+                        let data = doc.data();
+                        let tmp = data.user + ': ' + data.link + '\n';
+                        content = content + tmp;
+                    });
 
+                    content = 'Links:\n' + content;
+                    msg.channel.send(content);
+                } else {
+                    msg.channel.send('There are no links in the database waiting to be sent.');
+                }
+            });
         } else {
-            global.winston.debug('snowflake not found');
-            msg.reply('you are not authorized to run this command!');
+            msg.reply('invalid or missing argument!');
         }
     }
 

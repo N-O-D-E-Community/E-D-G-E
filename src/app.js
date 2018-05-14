@@ -1,6 +1,6 @@
 const winston = require('winston');
 winston.add(winston.transports.File, { filename: "edge.log" });
-winston.level = 'silly'; //TODO: set to info in production
+winston.level = 'info'; //TODO: set to info in production
 
 global.winston = winston;
 
@@ -12,12 +12,23 @@ let config = null;
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const admin = require('firebase-admin');
-const serviceAccount = require('../run/serviceAccountKey.json');
+const Permissions = require("discord.js/src/util/Permissions");
+
+let serviceAccount = null;
+
+try {
+    // noinspection JSFileReferences
+    serviceAccount = require('../run/serviceAccountKey.json');
+} catch (e) {
+    winston.error('Could not load serviceAccountKey.json, is it there? Is it readable?');
+    process.exit(0);
+}
 
 /*
 Try to load the config file, if it does not exist create one from template and save it
  */
 try {
+    // noinspection JSFileReferences
     config = require('../run/config.json');
 } catch (e) {
     let filePath = path.join(process.cwd(), './run/config.json');
@@ -59,8 +70,9 @@ try {
     try {
         fs.writeFileSync(filePath, JSON.stringify(config, null, "\t"));
     } catch(error) {
-        winston.info('Failed to create config file!');
-        winston.error(error);
+        winston.error('Failed to create config file! Most probably missing permissions.');
+        process.exit(0);
+        //winston.error(error);
     }
 
     winston.info('Please edit ', filePath, ' and restart the app.'); //avoid type conversion by using commas instead of concat.
@@ -75,24 +87,6 @@ admin.initializeApp({
 const database = admin.firestore();
 /* END FIREBASE */
 
-
-//BOT MODERATORS
-global.edgemods = [];
-database.collection('moderators').onSnapshot((snapshot) => {
-    winston.debug('Collection moderators changed, updating');
-    global.edgemods = [];
-    snapshot.forEach(doc => {
-        global.edgemods.push(doc.data());
-    })
-}, (error) => {
-    winston.error('Error getting collection moderators');
-    winston.error(error);
-});
-const unsub = function() {
-    winston.debug('Unsubscribing...');
-    database.collection('moderators').onSnapshot(() => {});
-};
-
 // dynamic command dir
 const cmdFiles = fs.readdirSync('./src/cmd');
 
@@ -106,7 +100,6 @@ const refs = {
     "config": config,
     "client": client,
     "database": database,
-    "unsub": unsub,
     "commands": commands
 };
 
@@ -129,7 +122,21 @@ client.on('message', msg => {
     }
 
     try {
-        commands.get(command).execute(refs, msg, args);
+        let cmd = commands.get(command);
+
+        winston.debug('command type: ' + cmd['type']);
+
+        switch(cmd['type']) {
+            case 2:
+                msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply('you are not authorized to use this command!');
+                break;
+            case 1:
+                (msg.author.id === refs.config.discord.owner || msg.member ? msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) ? cmd.execute(refs, msg, args) : msg.reply('you are not authorized to use this command!');
+                break;
+            default:
+                cmd.execute(refs, msg, args);
+        }
+
     } catch (error) {
         winston.error('An error occurred while executing command!');
         winston.error(error);
