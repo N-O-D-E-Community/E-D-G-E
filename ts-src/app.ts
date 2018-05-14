@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as Discord from "discord.js";
 import * as admin from "firebase-admin";
-import {Collection, Permissions} from "discord.js";
+import {Permissions} from "discord.js";
 
 /* INITIALIZE WINSTON */
 winston.add(winston.transports.File, { filename: "edge-ts.log" });
