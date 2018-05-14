@@ -48,7 +48,7 @@ module.exports = {
                     refs.winston.debug("Server responded but link is not reachable, ignoring");
                     msg.reply("given URL does not exist on that server!").catch(() => { refs.winston.error("Unable to send reply!") });
                 }
-            }).catch(error => {
+            }).catch(() => {
                 refs.winston.debug("Server not found, ignoring link");
                 msg.reply("given URI is pointing to a server that does not exist!").catch(() => { refs.winston.error("Unable to send reply!") });
             });

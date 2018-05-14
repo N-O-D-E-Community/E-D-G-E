@@ -15,7 +15,7 @@ module.exports = {
         }
         refs.winston.debug("type: " + type);
         let helpString = "```\nCommands available for you:\n";
-        refs.commands.forEach((value, key, map) => {
+        refs.commands.forEach((value, key) => {
             refs.winston.debug("key: " + key);
             if(type >= value["type"]) {
                 helpString = helpString.concat("\n", refs.config.discord.prefix, value["name"], " -- ", value["description"], " (", value["type"], ")");
