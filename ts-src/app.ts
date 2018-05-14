@@ -3,7 +3,6 @@ import * as path from "path";
 import * as fs from "fs";
 import * as Discord from "discord.js";
 import * as admin from "firebase-admin";
-import {Permissions} from "discord.js";
 
 /* INITIALIZE WINSTON */
 winston.add(winston.transports.File, { filename: "edge-ts.log" });
@@ -124,11 +123,9 @@ client.on("ready", () => {
 });
 client.on("message", msg => {
     if (!msg.content.startsWith(config.discord.prefix) || msg.author.bot) return;
-
     // parses command arguments
-    const args = msg.content.slice(config.discord.prefix.length).split(/ +/);
-    const command = args.shift().toLowerCase();
-
+    let args = msg.content.slice(config.discord.prefix.length).split(/ +/);
+    let command = args.shift().toLowerCase();
     if (!commands.has(command)) {
         winston.debug("User ", msg.author.username, " tried to execute non-existing command");
         msg.reply("requested command was not found!").then(() => {
@@ -138,29 +135,25 @@ client.on("message", msg => {
         });
         return;
     }
-
     try {
         let cmd = commands.get(command);
 
-        winston.debug('command type: ' + cmd['type']);
+        winston.debug("command type: " + cmd["type"]);
 
-        switch(cmd['type']) {
+        switch(cmd["type"]) {
             case 2:
-                msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply('you are not authorized to use this command!');
+                msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
                 break;
             case 1:
-                (msg.author.id === refs.config.discord.owner || msg.member ? msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) ? cmd.execute(refs, msg, args) : msg.reply('you are not authorized to use this command!');
+                (msg.author.id === refs.config.discord.owner || msg.member ? msg.member.hasPermission(client.Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
                 break;
             default:
                 cmd.execute(refs, msg, args);
         }
-
     } catch (error) {
-        winston.error('An error occurred while executing command!');
+        winston.error("An error occurred while executing command!");
         winston.error(error);
-        msg.reply('an error has occurred, please notify bot developers.').catch(() => {
-            winston.error("Could not send a reply!")
-        });
+        msg.reply("an error has occurred, please notify bot developers.").catch(() => { winston.error("Could not send a reply!") });
     }
 });
 // LOGIN

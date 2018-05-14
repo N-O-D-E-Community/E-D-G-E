@@ -4,10 +4,8 @@ module.exports = {
     name: "help",
     description: "Lists all commands",
     type: 0,
-    execute(refs, msg, args) {
-
+    execute(refs, msg) {
         let type = 0;
-
         if(msg.author.id === refs.config.discord.owner) {
             type = 2; //owner
         } else if(msg.member ? msg.member.hasPermission(refs.client.Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) {
@@ -15,9 +13,7 @@ module.exports = {
         } else {
             type = 0; //regular
         }
-
         refs.winston.debug("type: " + type);
-
         let helpString = "```\nCommands available for you:\n";
         refs.commands.forEach((value, key, map) => {
             refs.winston.debug("key: " + key);

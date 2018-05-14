@@ -8,18 +8,15 @@ module.exports = {
     description: "Checks and adds link to the database",
     type: 0,
     execute(refs, msg, args) {
-        refs.winston.debug("Link command executed", args[0]);
+        refs.winston.debug("Link command executed by:", msg.author.username, " ", args[0]);
         if (validUrl.isUri(args[0])) {
             refs.winston.debug("Link is a valid URI");
-
             let url = new URL(args[0]);
             if(refs.config.email.hostnameBlacklist.includes(url.hostname)) {
                 msg.reply("that hostname is blacklisted!").catch(() => { refs.winston.error("Unable to send reply!") });
                 refs.winston.info("User ", msg.author.username, " tried to add blacklisted link!");
                 return;
             }
-
-            // noinspection JSUnresolvedFunction
             urlExists(args[0]).then(function (response) {
                 refs.winston.debug("HTTP/S response returned for link");
                 if (response) {
@@ -55,8 +52,6 @@ module.exports = {
                 refs.winston.debug("Server not found, ignoring link");
                 msg.reply("given URI is pointing to a server that does not exist!").catch(() => { refs.winston.error("Unable to send reply!") });
             });
-
-
         } else {
             refs.winston.debug("Not an URI, ignoring");
             msg.reply("that link is not a valid URI!").catch(() => { refs.winston.error("Unable to send reply!") });

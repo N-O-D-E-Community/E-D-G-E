@@ -7,11 +7,9 @@ module.exports = {
     description: "`send`s or `list`s links that have not yet been sent",
     type: 1,
     execute(refs, msg, args) {
-        refs.winston.info("links executed by",msg.author.username);
+        refs.winston.info("Links executed by:",msg.author.username);
         let content = "";
-
         if(args[0].equals("send")) {
-
             refs.database.collection("links").where("seen", "==", false).get().then(snapshot => {
                 refs.winston.debug("Snapshot size :" + snapshot.size);
                 refs.winston.debug("Snapshot empty:" + snapshot.empty);
@@ -22,7 +20,6 @@ module.exports = {
                         content = content + tmp;
                         refs.database.collection("links").doc(doc.id).update({"seen": true});
                     });
-
                     /* NODEMAILER START */
                     let transporter = nodemailer.createTransport({
                         host: refs.config.email.smtp.host,
@@ -33,7 +30,6 @@ module.exports = {
                             pass: refs.config.email.smtp.auth.pass
                         }
                     });
-
                     // setup email data with unicode symbols
                     let mailOptions = {
                         from: refs.config.email.from, // sender address
@@ -49,7 +45,6 @@ module.exports = {
                             }
                         ]
                     };
-
                     // send mail with defined transport object
                     transporter.sendMail(mailOptions, (error, info) => {
                         if (error) {
@@ -59,12 +54,10 @@ module.exports = {
                             refs.winston.error(info);
                             return;
                         }
-
                         refs.winston.info("Sendlinks executed successfully!");
                         msg.reply("links sent!").catch(() => { refs.winston.error("Unable to send reply!") });
                     });
                     /* NODEMAILER END */
-
                 } else {
                     refs.winston.info("Snapshot empty, not sending.");
                     msg.reply("there is nothing to send.").catch(() => { refs.winston.error("Unable to send reply!") });
@@ -80,7 +73,6 @@ module.exports = {
                         let tmp = data.user + ": " + data.link + '\n';
                         content = content + tmp;
                     });
-
                     content = "Links:\n" + content;
                     msg.channel.send(content);
                 } else {
