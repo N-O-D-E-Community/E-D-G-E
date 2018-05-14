@@ -59,5 +59,6 @@ typings/
 
 .idea
 run/*
+built/*
 
 *.iml
