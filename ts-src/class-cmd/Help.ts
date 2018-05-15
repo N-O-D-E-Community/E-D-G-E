@@ -27,8 +27,8 @@ export default class Help implements ICommand {
         let helpString = "```\nCommands available for you:\n";
         refs["commands"].forEach((value, key) => {
             refs["winston"].debug("key: " + key);
-            if(type >= value.getType()) {
-                helpString = helpString.concat("\n", refs["config"].discord.prefix, value.getName(), " -- ", value.getDescription(), " (", value.getType(), ")");
+            if(type >= value["type"]) {
+                helpString = helpString.concat("\n", refs["config"].discord.prefix, value["name"], " -- ", value["description"], " (", value["type"], ")");
             }
         });
         if(type > 0) {
@@ -41,17 +41,4 @@ export default class Help implements ICommand {
             msg.reply(helpString).catch(() => { refs["winston"].error("Unable to send reply!") });
         });
     }
-
-    getDescription(): string {
-        return this.description;
-    }
-
-    getName(): string {
-        return this.name;
-    }
-
-    getType(): number {
-        return this.type;
-    }
-
 }

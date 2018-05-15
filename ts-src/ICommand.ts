@@ -5,7 +5,4 @@ export interface ICommand {
     readonly description: string;
     readonly type: number;
     execute(refs:object, msg:Discord.Message, args:Array<string>);
-    getName():string;
-    getDescription():string;
-    getType():number;
 }

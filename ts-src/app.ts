@@ -106,8 +106,8 @@ async function loadCommands()
             let constr = Object.keys(command)[0];
             let instance = new command[constr]();
             winston.debug(instance);
-            winston.debug(instance.getName());
-            commands.set(instance.getName(), instance);
+            winston.debug(instance["name"]);
+            commands.set(instance["name"], instance);
         }
     } catch (e) {
         winston.error("An error has occurred while loading commands!");
@@ -151,9 +151,9 @@ client.on("message", msg => {
     try {
         let cmd = commands.get(command);
 
-        winston.debug("command type: " + cmd.getType());
+        winston.debug("command type: " + cmd["type"]);
 
-        switch(cmd.getType()) {
+        switch(cmd["type"]) {
             case 2:
                 msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
                 break;

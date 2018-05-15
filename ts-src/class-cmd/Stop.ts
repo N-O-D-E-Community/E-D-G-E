@@ -21,16 +21,4 @@ export default class Stop implements ICommand {
             process.exit(0)
         }, 1000);
     }
-
-    getDescription(): string {
-        return this.description;
-    }
-
-    getName(): string {
-        return this.name;
-    }
-
-    getType(): number {
-        return this.type;
-    }
 }
