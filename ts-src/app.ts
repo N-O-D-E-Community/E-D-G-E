@@ -151,9 +151,9 @@ client.on("message", msg => {
     try {
         let cmd = commands.get(command);
 
-        winston.debug("command type: " + cmd["type"]);
+        winston.debug("command type: " + cmd.getType());
 
-        switch(cmd["type"]) {
+        switch(cmd.getType()) {
             case 2:
                 msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
                 break;

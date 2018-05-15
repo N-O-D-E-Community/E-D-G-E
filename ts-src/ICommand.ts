@@ -1,9 +1,9 @@
 import * as Discord from "discord.js";
 
 export interface ICommand {
-    name: string;
-    description: string;
-    type: number;
+    readonly name: string;
+    readonly description: string;
+    readonly type: number;
     execute(refs:object, msg:Discord.Message, args:Array<string>);
     getName():string;
     getDescription():string;
