@@ -94,20 +94,30 @@ database = admin.firestore();
 /* END FIREBASE */
 
 /* LOAD COMMANDS */
-try {
-    let cmdClasses = fs.readdirSync("./built/cmd");
-    commands = new Discord.Collection();
-    for(let file of cmdClasses) {
-        let command = require(`./cmd/${file}`);
-        commands.set(command.name, command);
+async function loadCommands()
+{
+    try {
+        let cmdClasses = fs.readdirSync("./built/class-cmd");
+        commands = new Discord.Collection();
+        for (let file of cmdClasses) {
+            winston.debug(process.cwd());
+            winston.debug(`./class-cmd/${file}`);
+            let command = await import(`./class-cmd/${file}`);
+            let constr = Object.keys(command)[0];
+            let instance = new command[constr]();
+            winston.debug(instance);
+            winston.debug(instance.getName());
+            commands.set(instance.getName(), instance);
+        }
+    } catch (e) {
+        winston.error("An error has occurred while loading commands!");
+        winston.error(e);
+        process.exit(1);
     }
-} catch (e) {
-    winston.error("An error has occurred while loading commands!");
-    winston.error(e);
-    process.exit(1);
 }
 /* END COMMANDS */
 
+loadCommands().then(() => {
 /* DISCORD.JS */
 client = new Discord.Client();
 refs = {
@@ -126,8 +136,11 @@ client.on("message", msg => {
     // parses command arguments
     let args = msg.content.slice(config.discord.prefix.length).split(/ +/);
     let command = args.shift().toLowerCase();
+
+    winston.debug(commands);
+
     if (!commands.has(command)) {
-        winston.debug("User ", msg.author.username, " tried to execute non-existing command");
+        winston.debug("User", msg.author.username, "tried to execute non-existing command");
         msg.reply("requested command was not found!").then(() => {
             winston.silly("Reply successfully sent");
         }, () => {
@@ -163,3 +176,4 @@ client.login(config.discord.token).catch(err => {
     process.exit(-1);
 });
 /* END DISCORD.JS */
+});
