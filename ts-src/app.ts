@@ -117,7 +117,7 @@ async function loadCommands()
 }
 /* END COMMANDS */
 
-loadCommands().then(() => {
+loadCommands().then(() => { //only continue after commands have been loaded
 /* DISCORD.JS */
 client = new Discord.Client();
 refs = {
@@ -136,9 +136,6 @@ client.on("message", msg => {
     // parses command arguments
     let args = msg.content.slice(config.discord.prefix.length).split(/ +/);
     let command = args.shift().toLowerCase();
-
-    winston.debug(commands);
-
     if (!commands.has(command)) {
         winston.debug("User", msg.author.username, "tried to execute non-existing command");
         msg.reply("requested command was not found!").then(() => {
@@ -150,9 +147,7 @@ client.on("message", msg => {
     }
     try {
         let cmd = commands.get(command);
-
         winston.debug("command type: " + cmd["type"]);
-
         switch(cmd["type"]) {
             case 2:
                 msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");

@@ -7,13 +7,11 @@ export default class Help implements ICommand {
     readonly description: string;
     readonly name: string;
     readonly type: number;
-
     constructor() {
         this.description = "Lists all commands";
         this.name = "help";
         this.type = 0;
     }
-
     execute(refs: object, msg: Discord.Message, args: Array<string>) {
         let type = 0;
         if(msg.author.id === refs["config"].discord.owner) {
