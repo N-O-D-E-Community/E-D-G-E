@@ -153,7 +153,7 @@ client.on("message", msg => {
                 msg.author.id === refs.config.discord.owner ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
                 break;
             case 1:
-                (msg.author.id === refs.config.discord.owner || msg.member ? msg.member.hasPermission(client.Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
+                (msg.author.id === refs.config.discord.owner || msg.member ? msg.member.hasPermission(Discord.Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) ? cmd.execute(refs, msg, args) : msg.reply("you are not authorized to use this command!");
                 break;
             default:
                 cmd.execute(refs, msg, args);

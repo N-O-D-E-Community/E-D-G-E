@@ -16,7 +16,7 @@ export default class Help implements ICommand {
         let type = 0;
         if(msg.author.id === refs["config"].discord.owner) {
             type = 2; //owner
-        } else if(msg.member ? msg.member.hasPermission(refs["client"].Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) {
+        } else if(msg.member ? msg.member.hasPermission(Discord.Permissions.FLAGS.MANAGE_MESSAGES, false, true, true) : false) {
             type = 1; //mod
         } else {
             type = 0; //regular
