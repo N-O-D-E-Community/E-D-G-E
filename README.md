@@ -13,12 +13,13 @@ A Discord bot for the N-O-D-E community
  - Obtain a bot token from [here](https://discordapp.com/developers/applications/me) by creating a new app, then creating a bot user and clicking on "Token" in the bot user section
  - (You can invite your bot user to a server by clicking on "Generate OAuth2 URL", choosing at least view channels, send messages and read message history permissions and navigating to the generated URL in your browser) 
  - Obtain a `serviceAccountKey.json` file from Firebase by logging in to the Firebase console, creating a project, enabling Cloud Firestore under "Database" and going to "Project settings > SERVICE ACCOUNTS" and clicking on "GENERATE NEW PRIVATE KEY"
- - Put the obtained file into `run` directory in the root directoy of the project
+ - Put the obtained file into `run` directory in the project root directory
  - Obtain your snowflake ID by going to "User Settings > APP SETTINGS > Appearance", enabling "Developer Mode", right-clicking on your name in any server and choosing "Copy ID"
- - Run `npm start`(in the root project directory) once and edit `run/config.json` with your values
- - Run `npm start` to run the bot
+ - Run `npm start`<sup>2</sup>(in the project root directory) once and edit `run/config.json`<sup>1</sup> with your values
+ - Run `npm start`<sup>2</sup> to run the bot
  
- Note: You will also need an SMTP service to send e-mails, you can use SendGrid, Mailgun or other similar services.
+ <sup>1</sup> You will also need an SMTP service to send e-mails, you can use SendGrid, Mailgun or other similar services.<br>
+ <sup>2</sup> We now use TypeScript, you will need to install TypeScript by running `npm install typescript -g`, otherwise you will not be able to run the bot.
 
 ### Rules
  
