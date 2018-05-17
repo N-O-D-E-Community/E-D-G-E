@@ -165,10 +165,20 @@ client.on("message", msg => {
     }
 });
 // LOGIN
-client.login(config.discord.token).catch(err => {
-    winston.error("Unable to login, please check \"config.json\"");
+    try {
+        client.login(config.discord.token).catch(err => {
+            winston.error("Unable to login, please check \"config.json\"");
+            winston.error(err);
+            process.exit(-1);
+        });
+    } catch (e) {
+        winston.error(e);
+        winston.info("Caught in try-catch, discarding, let's see what happens...");
+    }
+
+client.on("error", err => {
     winston.error(err);
-    process.exit(-1);
+    winston.info("Caught in 'on error', discarding, let's see what happens...");
 });
 /* END DISCORD.JS */
 });
