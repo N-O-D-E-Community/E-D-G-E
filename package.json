@@ -12,7 +12,8 @@
     "nodemailer": "^4.6.4",
     "url-exists-deep": "^1.1.0",
     "valid-url": "^1.0.9",
-    "winston": "^2.4.2"
+    "winston": "^2.4.2",
+    "typescript": "^2.8.3"
   },
   "devDependencies": {
     "typescript": "^2.8.3"
