@@ -48,18 +48,7 @@ if(process.env.ENV === "HEROKU") { // If we are running on Heroku we will need t
         }
     };
 
-    serviceAccount = {
-        "type": "service_account",
-        "project_id": process.env.F_P_ID,
-        "private_key_id": process.env.F_PRIV_ID,
-        "private_key": process.env.F_PRIV,
-        "client_email": process.env.F_CEM,
-        "client_id": process.env.F_CID,
-        "auth_uri": process.env.F_A_URI,
-        "token_uri": process.env.F_T_URI,
-        "auth_provider_x509_cert_url": process.env.F_A_P_CU,
-        "client_x509_cert_url": process.env.F_C_CU
-    };
+    serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, 'base64').toString('utf8'));
 
     try {
         admin.initializeApp({
