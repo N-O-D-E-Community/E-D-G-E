@@ -12,86 +12,144 @@ winston.info("Starting E-D-G-E TypeScript Edition...");
 
 /* DECLARE VARIABLES */
 let config;
-let serviceAccount: string;
+let serviceAccount;
 let database;
 let refs;
 let commands;
 let client;
 /* END VARIABLES */
 
-/* LOAD THE CONFIGURATION FILE */
-try {
-    config = require("../run/config.json");
-} catch (e) {
-    let filePath = path.join(process.cwd(), "./run/config.json");
-    if(fs.existsSync(filePath)) {
-        winston.error("Failed to load config.json! Please check if node has read permissions.");
-        winston.error(e);
-        process.exit(1);
-    }
-    winston.info("Could not find config.json, creating it now...");
-    let template =
-        {
-            "discord": {
-                "token": "MY_BOT_USER_TOKEN",
-                "prefix": "MY_PREFIX",
-                "owner": "MY_SNOWFLAKE_ID"
-            },
-            "firebase": {
-                "databaseURL": "https://MY_PROJECT_NAME.firebaseio.com"
-            },
-            "email": {
-                "hostnameBlacklist": [
-                    "example.com"
-                ],
-                "ownerEmail": "admin@example.com",
-                "from": "\"E-D-G-E\" <e-d-g-e@MY_DOMAIN.TLD>",
-                "to": "testing@example.com, testing2@example.com",
-                "smtp": {
-                    "host": "smtp.MY_SMTP_SERVICE.TLD",
-                    "port": 587,
-                    "secure": false,
-                    "auth": {
-                        "user": "MY_SMTP_USER",
-                        "pass": "MY_SMTP_PASSWORD"
-                    }
+if(process.env.ENV === "HEROKU") { // If we are running on Heroku we will need to load everything from the "Config Vars"
+    let bl = process.env.E_BL.split(",");
+
+    config = {
+        "discord": {
+            "token": process.env.D_T,
+            "prefix": process.env.D_P,
+            "owner": process.env.D_O
+        },
+        "firebase": {
+            "databaseURL": process.env.F_DU
+        },
+        "email": {
+            "hostnameBlacklist": bl,
+            "ownerEmail": process.env.E_OE,
+            "from": process.env.E_F,
+            "to": process.env.E_T,
+            "smtp": {
+                "host": process.env.E_S_H,
+                "port": process.env.E_S_P,
+                "secure": process.env.E_S_S,
+                "auth": {
+                    "user": process.env.E_S_A_U,
+                    "pass": process.env.E_S_A_P
                 }
             }
-        };
+        }
+    };
+
+    serviceAccount = {
+        "type": "service_account",
+        "project_id": process.env.F_P_ID,
+        "private_key_id": process.env.F_PRIV_ID,
+        "private_key": process.env.F_PRIV,
+        "client_email": process.env.F_CEM,
+        "client_id": process.env.F_CID,
+        "auth_uri": process.env.F_A_URI,
+        "token_uri": process.env.F_T_URI,
+        "auth_provider_x509_cert_url": process.env.F_A_P_CU,
+        "client_x509_cert_url": process.env.F_C_CU
+    };
 
     try {
-        fs.writeFileSync(filePath, JSON.stringify(template, null, "\t"));
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: config.firebase.databaseURL
+        });
     } catch (e) {
-        winston.error("Could not write config.json, please ensure that node has write permissions!");
+        winston.error("Could not initialize Firebase Admin SDK!");
+        winston.error(e);
+        process.exit(-1);
+    }
+    database = admin.firestore();
+
+} else {
+
+    /* LOAD THE CONFIGURATION FILE */
+    try {
+        config = require("../run/config.json");
+    } catch (e) {
+        let filePath = path.join(process.cwd(), "./run/config.json");
+        if(fs.existsSync(filePath)) {
+            winston.error("Failed to load config.json! Please check if node has read permissions.");
+            winston.error(e);
+            process.exit(1);
+        }
+        winston.info("Could not find config.json, creating it now...");
+        let template =
+            {
+                "discord": {
+                    "token": "MY_BOT_USER_TOKEN",
+                    "prefix": "MY_PREFIX",
+                    "owner": "MY_SNOWFLAKE_ID"
+                },
+                "firebase": {
+                    "databaseURL": "https://MY_PROJECT_NAME.firebaseio.com"
+                },
+                "email": {
+                    "hostnameBlacklist": [
+                        "example.com"
+                    ],
+                    "ownerEmail": "admin@example.com",
+                    "from": "\"E-D-G-E\" <e-d-g-e@MY_DOMAIN.TLD>",
+                    "to": "testing@example.com, testing2@example.com",
+                    "smtp": {
+                        "host": "smtp.MY_SMTP_SERVICE.TLD",
+                        "port": 587,
+                        "secure": false,
+                        "auth": {
+                            "user": "MY_SMTP_USER",
+                            "pass": "MY_SMTP_PASSWORD"
+                        }
+                    }
+                }
+            };
+
+        try {
+            fs.writeFileSync(filePath, JSON.stringify(template, null, "\t"));
+        } catch (e) {
+            winston.error("Could not write config.json, please ensure that node has write permissions!");
+            winston.error(e);
+            process.exit(1);
+        }
+
+        winston.info("Configuration file \"config.json\" was created in directory \"run\", please edit this file following the instructions in README.md and run the bot again.");
+        process.exit(0);
+    }
+    /* END CONFIGURATION FILE */
+
+    /* INITIALIZE FIREBASE */
+    try {
+        serviceAccount = require("../run/serviceAccountKey.json");
+    } catch (e) {
+        winston.error("An error occurred loading serviceAccountKey.json, please check if the file exists and if node has read permissions.");
         winston.error(e);
         process.exit(1);
     }
+    try {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: config.firebase.databaseURL
+        });
+    } catch (e) {
+        winston.error("Could not initialize Firebase Admin SDK!");
+        winston.error(e);
+        process.exit(-1);
+    }
+    database = admin.firestore();
+    /* END FIREBASE */
+}
 
-    winston.info("Configuration file \"config.json\" was created in directory \"run\", please edit this file following the instructions in README.md and run the bot again.");
-    process.exit(0);
-}
-/* END CONFIGURATION FILE */
-
-/* INITIALIZE FIREBASE */
-try {
-    serviceAccount = require("../run/serviceAccountKey.json");
-} catch (e) {
-    winston.error("An error occurred loading serviceAccountKey.json, please check if the file exists and if node has read permissions.");
-    winston.error(e);
-    process.exit(1);
-}
-try {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        databaseURL: config.firebase.databaseURL
-    });
-} catch (e) {
-    winston.error("Could not initialize Firebase Admin SDK!");
-    winston.error(e);
-    process.exit(-1);
-}
-database = admin.firestore();
-/* END FIREBASE */
 
 /* LOAD COMMANDS */
 async function loadCommands()
